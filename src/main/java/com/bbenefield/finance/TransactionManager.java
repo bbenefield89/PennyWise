@@ -26,7 +26,8 @@ public class TransactionManager {
     public List<Transaction> getTransactionsByDate(LocalDate earliestDate, LocalDate latestDate) {
         return this.transactions.stream().filter(transaction -> {
             LocalDate transactionDate = transaction.getDate();
-            return transactionDate.isAfter(earliestDate) && transactionDate.isBefore(latestDate);
+            return (transactionDate.isAfter(earliestDate) || transactionDate.isEqual(earliestDate)) &&
+                    (transactionDate.isBefore(latestDate) || transactionDate.isEqual(latestDate));
         }).collect(Collectors.toList());
     }
 

@@ -1,5 +1,6 @@
 package com.bbenefield.finance;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
@@ -43,7 +44,31 @@ public class Main {
     }
 
     private static void handleAddTransaction() {
-        transactionManager.addTransaction();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter transaction amount:");
+        double amount = scanner.nextDouble();
+
+        System.out.println("Enter transaction type (Income/Expense):");
+        String type = scanner.next();
+
+        System.out.println("Enter transaction category:");
+        String category = scanner.next();
+
+        System.out.println("Enter transaction description (optional):");
+        scanner.nextLine();
+        String description = scanner.nextLine();
+
+        Transaction transaction = new Transaction(
+                transactionManager.getTransactions().size(),
+                amount,
+                LocalDate.now(),
+                type,
+                category,
+                description
+        );
+
+        transactionManager.addTransaction(transaction);
         System.out.println("Transaction added successfully!");
     }
 

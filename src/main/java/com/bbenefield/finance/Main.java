@@ -2,6 +2,7 @@ package com.bbenefield.finance;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -11,39 +12,43 @@ public class Main {
 
     public static void main(String[] args) {
         while (true) {
-            String statement = "Choose an option:\n";
-            statement += "[1] Add Transaction\n";
-            statement += "[2] View Transactions\n";
-            statement += "[3] Delete Transaction\n";
-            statement += "[4] Filter Transactions\n";
-            statement += "[0] Exit";
+            try {
+                String statement = "Choose an option:\n";
+                statement += "[A] Add Transaction\n";
+                statement += "[V] View Transactions\n";
+                statement += "[D] Delete Transaction\n";
+                statement += "[F] Filter Transactions\n";
+                statement += "[E] Exit";
 
-            System.out.println(statement);
-            int choice = scanner.nextInt();
+                System.out.println(statement);
+                String choice = scanner.next();
 
-            switch (choice) {
-                case 1:
-                    handleAddTransaction();
-                    break;
+                switch (choice.toUpperCase()) {
+                    case "A":
+                        handleAddTransaction();
+                        break;
 
-                case 2:
-                    handleListTransactions();
-                    break;
+                    case "V":
+                        handleListTransactions();
+                        break;
 
-                case 3:
-                    handleDeleteTransaction();
-                    break;
+                    case "D":
+                        handleDeleteTransaction();
+                        break;
 
-                case 4:
-                    handleFilterTransactions();
-                    break;
+                    case "F":
+                        handleFilterTransactions();
+                        break;
 
-                case 0:
-                    System.exit(0);
-                    break;
+                    case "E":
+                        System.exit(0);
+                        break;
 
-                default:
-                    System.out.println("Invalid option, please try again.");
+                    default:
+                        System.out.println("Invalid option, please try again.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid option, please try again.");
             }
         }
     }

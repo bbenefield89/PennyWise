@@ -1,5 +1,8 @@
 package com.bbenefield.finance;
 
+import com.bbenefield.finance.Models.Transaction;
+import com.bbenefield.finance.Services.TransactionManager;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.InputMismatchException;

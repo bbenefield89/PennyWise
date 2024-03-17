@@ -1,4 +1,6 @@
-package com.bbenefield.finance;
+package com.bbenefield.finance.Services;
+
+import com.bbenefield.finance.Models.Transaction;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

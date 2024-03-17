@@ -1,4 +1,4 @@
-package com.bbenefield.finance;
+package com.bbenefield.finance.Models;
 
 import java.time.LocalDate;
 

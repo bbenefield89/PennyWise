@@ -1,6 +1,7 @@
 package com.bbenefield.finance.Services;
 
 import com.bbenefield.finance.Models.Transaction;
+import com.bbenefield.finance.Repositories.TransactionRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 
 public class TransactionManager {
     private List<Transaction> transactions = new ArrayList<>();
+    private final TransactionRepository transactionRepository = new TransactionRepository("");
 
     public void addTransaction(Transaction transaction) {
         this.transactions.add(transaction);

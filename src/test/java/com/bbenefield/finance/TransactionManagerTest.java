@@ -18,8 +18,7 @@ public class TransactionManagerTest {
                 10,
                 LocalDate.parse("2024-03-14"),
                 "Income",
-                "Paycheck",
-                "");
+                "Paycheck");
 
         transactionManager.addTransaction(transaction);
 
@@ -37,16 +36,14 @@ public class TransactionManagerTest {
                 10,
                 LocalDate.parse("2024-03-14"),
                 "Income",
-                "Paycheck",
-                "");
+                "Paycheck");
 
         Transaction transaction2 = new Transaction(
                 0,
                 20,
                 LocalDate.parse("2024-03-14"),
                 "Income",
-                "Paycheck",
-                "");
+                "Paycheck");
 
         transactionManager.addTransaction(transaction1);
         transactionManager.addTransaction(transaction2);
@@ -69,16 +66,14 @@ public class TransactionManagerTest {
                 10,
                 LocalDate.parse("2024-03-02"),
                 "Income",
-                "Paycheck",
-                "");
+                "Paycheck");
 
         Transaction transaction2 = new Transaction(
                 0,
                 20,
                 LocalDate.parse("2024-03-14"),
                 "Income",
-                "Paycheck",
-                "");
+                "Paycheck");
 
         transactionManager.addTransaction(transaction1);
         transactionManager.addTransaction(transaction2);
@@ -110,24 +105,21 @@ public class TransactionManagerTest {
                 10,
                 LocalDate.parse("2024-03-02"),
                 "Income",
-                "Paycheck",
-                "");
+                "Paycheck");
 
         Transaction transaction2 = new Transaction(
                 0,
                 20,
                 LocalDate.parse("2024-03-14"),
                 "Withdraw",
-                "Paycheck",
-                "");
+                "Paycheck");
 
         Transaction transaction3 = new Transaction(
                 0,
                 20,
                 LocalDate.parse("2024-03-14"),
                 "Withdraw",
-                "Paycheck",
-                "");
+                "Paycheck");
 
         transactionManager.addTransaction(transaction1);
         transactionManager.addTransaction(transaction2);
@@ -151,24 +143,21 @@ public class TransactionManagerTest {
                 10,
                 LocalDate.parse("2024-03-02"),
                 "Income",
-                "Paycheck",
-                "");
+                "Paycheck");
 
         Transaction transaction2 = new Transaction(
                 0,
                 20,
                 LocalDate.parse("2024-03-14"),
                 "Withdraw",
-                "Grocery",
-                "");
+                "Grocery");
 
         Transaction transaction3 = new Transaction(
                 0,
                 20,
                 LocalDate.parse("2024-03-14"),
                 "Withdraw",
-                "Grocery",
-                "");
+                "Grocery");
 
         transactionManager.addTransaction(transaction1);
         transactionManager.addTransaction(transaction2);
@@ -192,8 +181,7 @@ public class TransactionManagerTest {
                 10,
                 LocalDate.parse("2024-03-02"),
                 "Income",
-                "Paycheck",
-                "");
+                "Paycheck");
 
         transactionManager.addTransaction(transaction);
 

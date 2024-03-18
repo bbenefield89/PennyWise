@@ -45,7 +45,7 @@ public class InputController {
         String statement = "\nPlease provide the file name of your ledger (e.g my_ledger.txt)";
         System.out.println(statement);
         String ledgerFileName = scanner.next();
-        return TransactionRepository.getTransactionsFromLedger(ledgerFileName);
+        return transactionManager.loadTransactions("./ledgers/ledger_1.csv");
     }
 
     private static boolean handleCreateNewLedger() {
@@ -105,18 +105,12 @@ public class InputController {
         System.out.println("Enter transaction category:");
         String category = scanner.next();
 
-        System.out.println("Enter transaction description (optional):");
-        scanner.nextLine();
-        String description = scanner.nextLine();
-
         Transaction transaction = new Transaction(
                 transactionManager.getTransactions().size(),
                 amount,
                 LocalDate.now(),
                 type,
-                category,
-                description
-        );
+                category);
 
         transactionManager.addTransaction(transaction);
         System.out.println("Transaction added successfully!");
@@ -229,13 +223,12 @@ public class InputController {
         }
         else {
             for (Transaction transaction : transactions) {
-                System.out.printf("\nID: %o | Date: %s | Type: %s | Category: %s | Amount: $%.2f | Description: %s",
+                System.out.printf("\nID: %o | Date: %s | Type: %s | Category: %s | Amount: $%.2f",
                         transaction.getId(),
                         transaction.getDate(),
                         transaction.getType(),
                         transaction.getCategory(),
-                        transaction.getAmount(),
-                        transaction.getDescription());
+                        transaction.getAmount());
             }
         }
 

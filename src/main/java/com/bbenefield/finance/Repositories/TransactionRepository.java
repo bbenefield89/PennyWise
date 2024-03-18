@@ -1,31 +1,22 @@
 package com.bbenefield.finance.Repositories;
 
 import com.bbenefield.finance.Models.Transaction;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.*;
 import java.util.List;
 
 public class TransactionRepository {
-    private static Path pathToLedger;
-    
-    public static boolean getTransactionsFromLedger(String ledgerFileName) {
-        Path path = Path.of(LedgerRepository.ledgerDirPath + "/" + ledgerFileName);
+    public static List<Transaction> getTransactionsFromLedger(String pathToLedger) throws FileNotFoundException {
+        FileReader fileReader = new FileReader(pathToLedger);
+        CsvToBean<Transaction> csvToBean = new CsvToBeanBuilder<Transaction>(fileReader)
+                .withSkipLines(1)
+                .withType(Transaction.class)
+                .withIgnoreLeadingWhiteSpace(true)
+                .build();
 
-        try {
-            List<String> lines = Files.readAllLines(path);
-            for (String line : lines) {
-                System.out.println(line);
-            }
-            return true;
-        }
-        catch (IOException e) {
-            System.out.println("\nFailed to find ledger: " + e.getMessage() + "\n");
-            return false;
-        }
+        return csvToBean.parse();
     }
 
 //    public static void saveTransactions(List<Transaction> transactions) {

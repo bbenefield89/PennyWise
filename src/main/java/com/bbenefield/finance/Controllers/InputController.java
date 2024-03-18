@@ -1,6 +1,7 @@
 package com.bbenefield.finance.Controllers;
 
 import com.bbenefield.finance.Models.Transaction;
+import com.bbenefield.finance.Repositories.TransactionRepository;
 import com.bbenefield.finance.Services.TransactionManager;
 
 import java.time.LocalDate;
@@ -14,24 +15,41 @@ public class InputController {
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void promptLedgerSelection() {
-        String statement = "Would you like to:\n";
-        statement += "[L]oad an existing ledger\n";
-        statement += "[C]reate a new ledger\n\n";
-        System.out.println(statement);
+        boolean isLedgerSelected = false;
 
-        String choice = scanner.next();
+        while (!isLedgerSelected) {
+            String statement = "Would you like to:\n";
+            statement += "[L]oad an existing ledger\n";
+            statement += "[C]reate a new ledger\n";
+            System.out.println(statement);
 
-        switch (choice.toUpperCase()) {
-            case "L":
-                break;
+            String choice = scanner.next();
 
-            case "C":
-                break;
+            switch (choice.toUpperCase()) {
+                case "L":
+                    isLedgerSelected = handleLoadExistingLedger();
+                    break;
 
-            default:
-                System.out.println("Invalid option, please try again");
+                case "C":
+                    isLedgerSelected = handleCreateNewLedger();
+                    break;
 
+                default:
+                    System.out.println("Invalid option, please try again");
+
+            }
         }
+    }
+
+    private static boolean handleLoadExistingLedger() {
+        String statement = "\nPlease provide the file name of your ledger (e.g my_ledger.txt)";
+        System.out.println(statement);
+        String ledgerFileName = scanner.next();
+        return TransactionRepository.getTransactionsFromLedger(ledgerFileName);
+    }
+
+    private static boolean handleCreateNewLedger() {
+        return true;
     }
 
     public static void acceptUserInput() {

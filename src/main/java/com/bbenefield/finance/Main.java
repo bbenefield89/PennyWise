@@ -14,6 +14,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         LedgerRepository.createLedgerDirectory();
+        InputController.promptLedgerSelection();
         InputController.acceptUserInput();
     }
 }

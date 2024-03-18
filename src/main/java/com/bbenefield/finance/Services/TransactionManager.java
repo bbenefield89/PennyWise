@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 public class TransactionManager {
     private List<Transaction> transactions = new ArrayList<>();
-    private final TransactionRepository transactionRepository = new TransactionRepository("");
 
     public void addTransaction(Transaction transaction) {
         this.transactions.add(transaction);

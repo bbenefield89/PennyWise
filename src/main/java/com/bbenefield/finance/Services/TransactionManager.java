@@ -1,28 +1,21 @@
 package com.bbenefield.finance.Services;
 
 import com.bbenefield.finance.Models.Transaction;
-import com.bbenefield.finance.Repositories.TransactionRepository;
+import com.bbenefield.finance.Repositories.ITransactionRepository;
 
 import java.io.FileNotFoundException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TransactionManager {
     private final List<Transaction> transactions = new ArrayList<>();
+    private final ITransactionRepository transactionRepository;
 
-    public boolean loadTransactions(String pathToLedger) {
-        try {
-            List<Transaction> transactionsFromCsv = TransactionRepository.getTransactionsFromLedger(
-                    pathToLedger);
-            transactions.addAll(transactionsFromCsv);
-            return true;
-        }
-        catch (FileNotFoundException e) {
-            System.out.println("Could not find ledger: " + e.getMessage() + "\n");
-            return false;
-        }
+    public TransactionManager(ITransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
     }
 
     public void addTransaction(Transaction transaction) {
@@ -30,7 +23,13 @@ public class TransactionManager {
     }
 
     public List<Transaction> getTransactions() {
-        return this.transactions;
+        try {
+            return transactionRepository.getTransactions();
+        }
+        catch (FileNotFoundException e) {
+            System.out.println("Could not find ledger: " + e.getMessage() + "\n");
+            return Collections.emptyList();
+        }
     }
 
     public List<Transaction> getTransactionsByAmount(double min, double max) {

@@ -20,4 +20,9 @@ public class LedgerRepository {
             System.out.println("Failed to create directory: " + e.getMessage());
         }
     }
+
+    public static boolean checkLedgerExistence(String ledgerFileName) {
+        Path path = Path.of(String.format("%s/%s", ledgerDirPath, ledgerFileName));
+        return Files.exists(path);
+    }
 }

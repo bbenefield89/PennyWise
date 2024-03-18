@@ -1,7 +1,9 @@
 package com.bbenefield.finance.Controllers;
 
 import com.bbenefield.finance.Models.Transaction;
-import com.bbenefield.finance.Repositories.TransactionRepository;
+import com.bbenefield.finance.Repositories.FileTransactionRepository;
+import com.bbenefield.finance.Repositories.ITransactionRepository;
+import com.bbenefield.finance.Repositories.LedgerRepository;
 import com.bbenefield.finance.Services.TransactionManager;
 
 import java.time.LocalDate;
@@ -11,7 +13,8 @@ import java.util.List;
 import java.util.Scanner;
 
 public class InputController {
-    private static final TransactionManager transactionManager = new TransactionManager();
+    private static ITransactionRepository transactionRepository;
+    private static TransactionManager transactionManager;
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void promptLedgerSelection() {
@@ -36,7 +39,6 @@ public class InputController {
 
                 default:
                     System.out.println("Invalid option, please try again");
-
             }
         }
     }
@@ -45,7 +47,14 @@ public class InputController {
         String statement = "\nPlease provide the file name of your ledger (e.g my_ledger.txt)";
         System.out.println(statement);
         String ledgerFileName = scanner.next();
-        return transactionManager.loadTransactions("./ledgers/ledger_1.csv");
+
+        if (LedgerRepository.checkLedgerExistence("ledger_1.csv")) {
+            transactionRepository = new FileTransactionRepository("./ledgers/ledger_1.csv");
+            transactionManager = new TransactionManager(transactionRepository);
+            return true;
+        }
+
+        return false;
     }
 
     private static boolean handleCreateNewLedger() {
@@ -55,12 +64,12 @@ public class InputController {
     public static void acceptUserInput() {
         while (true) {
             try {
-                String statement = "Choose an option:\n";
+                String statement = "\nChoose an option:\n";
                 statement += "[A] Add Transaction\n";
                 statement += "[V] View Transactions\n";
                 statement += "[D] Delete Transaction\n";
                 statement += "[F] Filter Transactions\n";
-                statement += "[E] Exit";
+                statement += "[E] Exit\n";
 
                 System.out.println(statement);
                 String choice = scanner.next();
@@ -232,6 +241,6 @@ public class InputController {
             }
         }
 
-        System.out.print("\n\n");
+        System.out.print("\n");
     }
 }

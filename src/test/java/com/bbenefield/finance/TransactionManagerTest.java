@@ -4,10 +4,13 @@ import com.bbenefield.finance.Models.Transaction;
 import com.bbenefield.finance.Repositories.FileTransactionRepository;
 import com.bbenefield.finance.Repositories.ITransactionRepository;
 import com.bbenefield.finance.Services.TransactionManager;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,8 +18,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class TransactionManagerTest {
     private ITransactionRepository transactionRepositoryMock;
@@ -28,33 +30,60 @@ public class TransactionManagerTest {
         transactionManager = new TransactionManager(transactionRepositoryMock);
     }
 
-//    @Test
-//    public void addTransactionTest() {
-//        Transaction transaction = new Transaction(
-//                0,
-//                10,
-//                LocalDate.parse("2024-03-14"),
-//                "Income",
-//                "Paycheck");
-//
-//        transactionManager.addTransaction(transaction);
-//
-//        assertEquals(
-//                1,
-//                transactionManager.getTransactions().size(),
-//                "transactionManager should have one transaction");
-//    }
-
     @Test
-    public void getTransactions_FileNotFoundExceptionTest() throws FileNotFoundException {
-        when(transactionRepositoryMock.getTransactions())
-                .thenThrow(FileNotFoundException.class);
+    public void addTransaction_ExceptionTest() throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
+        Transaction transaction = new Transaction(
+                10,
+                LocalDate.parse("2024-03-14"),
+                "Income",
+                "Paycheck");
 
-        assertTrue(transactionManager.getTransactions().isEmpty());
+        doThrow(new IOException("IOException from test method"))
+                .when(transactionRepositoryMock)
+                .createTransaction(transaction);
+
+        Exception exception = assertThrows(IOException.class, () -> {
+            transactionManager.addTransaction(transaction);
+        });
+
+        verify(transactionRepositoryMock, times(1))
+                .createTransaction(transaction);
+
+        assertTrue(exception.getMessage().contains("IOException from test method"));
     }
 
     @Test
-    public void getTransactions_ZeroTransactionsReturned() throws FileNotFoundException {
+    public void addTransaction_SuccessTest() throws Exception {
+        Transaction transaction = new Transaction(
+                10,
+                LocalDate.parse("2024-03-14"),
+                "Income",
+                "Paycheck");
+
+        transactionManager.addTransaction(transaction);
+
+        verify(transactionRepositoryMock, times(1))
+                .createTransaction(transaction);
+    }
+
+    @Test
+    public void getTransactions_FileNotFoundExceptionTest() throws Exception {
+        doThrow(new IOException("IOException from test method"))
+                .when(transactionRepositoryMock)
+                .getTransactions();
+
+        Exception exception = assertThrows(IOException.class, () -> {
+            transactionManager.getTransactions();
+        }, "Hello");
+
+        verify(transactionRepositoryMock, times(1))
+                .getTransactions();
+
+        assertTrue(exception.getMessage().contains("IOException from test method"));
+    }
+
+    @Test
+    public void getTransactions_ZeroTransactionsReturned() throws Exception {
         when(transactionRepositoryMock.getTransactions())
                 .thenReturn(new ArrayList<>());
 
@@ -62,10 +91,10 @@ public class TransactionManagerTest {
     }
 
     @Test
-    public void getTransactions_MultipleTransactionsReturned() throws FileNotFoundException {
+    public void getTransactions_MultipleTransactionsReturned() throws Exception {
         List<Transaction> transactions = Arrays.asList(
-                new Transaction(0, 100.00, LocalDate.now(), "Income", "Salary"),
-                new Transaction(1, 100.00, LocalDate.now(), "Income", "Salary"));
+                new Transaction(100.00, LocalDate.now(), "Income", "Salary"),
+                new Transaction(100.00, LocalDate.now(), "Income", "Salary"));
 
         when(transactionRepositoryMock.getTransactions())
                 .thenReturn(transactions);

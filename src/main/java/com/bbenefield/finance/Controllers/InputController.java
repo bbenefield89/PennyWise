@@ -5,12 +5,13 @@ import com.bbenefield.finance.Repositories.FileTransactionRepository;
 import com.bbenefield.finance.Repositories.ITransactionRepository;
 import com.bbenefield.finance.Repositories.LedgerRepository;
 import com.bbenefield.finance.Services.TransactionManager;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class InputController {
     private static ITransactionRepository transactionRepository;
@@ -114,34 +115,41 @@ public class InputController {
         System.out.println("Enter transaction category:");
         String category = scanner.next();
 
-        Transaction transaction = new Transaction(
-                transactionManager.getTransactions().size(),
-                amount,
-                LocalDate.now(),
-                type,
-                category);
+        Transaction transaction = new Transaction(amount, LocalDate.now(), type, category);
 
-        transactionManager.addTransaction(transaction);
-        System.out.println("Transaction added successfully!");
+        try {
+            transactionManager.addTransaction(transaction);
+        } catch (CsvRequiredFieldEmptyException e) {
+            System.out.println("A required fields in the CSV file is empty: " + e.getMessage());
+        } catch (CsvDataTypeMismatchException e) {
+            System.out.println("There is a data type mismatch in the CSV: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("An error occurred while reading/writing CSV: " + e.getMessage());
+        }
     }
 
     private static void handleListTransactions() {
-        List<Transaction> transactions = transactionManager.getTransactions();
-        handleDisplayTransactions(transactions);
+        try {
+            List<Transaction> transactions = transactionManager.getTransactions();
+            handleDisplayTransactions(transactions);
+        } catch (IOException e) {
+            System.out.println("An error occurred while reading/writing CSV: " + e.getMessage());
+        }
     }
 
     private static void handleDeleteTransaction() {
         handleListTransactions();
         System.out.println("Which transaction would you like to delete?");
 
-        int transactionId = scanner.nextInt();
+        String transactionIdString = scanner.next();
+        UUID transactionId = UUID.fromString(transactionIdString);
         boolean is_removed = transactionManager.deleteTransactionById(transactionId);
 
         if (is_removed) {
-            System.out.printf("Transaction %o has been successfully removed", transactionId);
+            System.out.printf("Transaction %s has been successfully removed", transactionId);
         }
         else {
-            System.out.printf("No transaction with id %o found", transactionId);
+            System.out.printf("No transaction with id %s found", transactionId);
         }
 
         System.out.println("\n");
@@ -232,7 +240,7 @@ public class InputController {
         }
         else {
             for (Transaction transaction : transactions) {
-                System.out.printf("\nID: %o | Date: %s | Type: %s | Category: %s | Amount: $%.2f",
+                System.out.printf("\nID: %s | Date: %s | Type: %s | Category: %s | Amount: $%.2f",
                         transaction.getId(),
                         transaction.getDate(),
                         transaction.getType(),

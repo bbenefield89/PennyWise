@@ -5,10 +5,11 @@ import com.opencsv.bean.CsvBindByPosition;
 import com.opencsv.bean.CsvDate;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public class Transaction {
     @CsvBindByPosition(position = 0)
-    private int id;
+    private UUID id;
 
     @CsvBindByPosition(position = 4)
     private double amount;
@@ -25,19 +26,19 @@ public class Transaction {
 
     public Transaction() {}
 
-    public Transaction(int id, double amount, LocalDate date, String type, String category) {
-        this.id = id;
+    public Transaction(double amount, LocalDate date, String type, String category) {
+        this.id = UUID.randomUUID();
         this.amount = amount;
         this.date = date;
         this.type = type;
         this.category = category;
     }
 
-    public int getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

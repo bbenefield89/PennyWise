@@ -2,12 +2,16 @@ package com.bbenefield.finance.Services;
 
 import com.bbenefield.finance.Models.Transaction;
 import com.bbenefield.finance.Repositories.ITransactionRepository;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class TransactionManager {
@@ -18,18 +22,12 @@ public class TransactionManager {
         this.transactionRepository = transactionRepository;
     }
 
-    public void addTransaction(Transaction transaction) {
-        this.transactions.add(transaction);
+    public void addTransaction(Transaction transaction) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
+        transactionRepository.createTransaction(transaction);
     }
 
-    public List<Transaction> getTransactions() {
-        try {
-            return transactionRepository.getTransactions();
-        }
-        catch (FileNotFoundException e) {
-            System.out.println("Could not find ledger: " + e.getMessage() + "\n");
-            return Collections.emptyList();
-        }
+    public List<Transaction> getTransactions() throws IOException {
+        return transactionRepository.getTransactions();
     }
 
     public List<Transaction> getTransactionsByAmount(double min, double max) {
@@ -59,7 +57,7 @@ public class TransactionManager {
         }).collect(Collectors.toList());
     }
 
-    public boolean deleteTransactionById(int id) {
+    public boolean deleteTransactionById(UUID id) {
         return transactions.removeIf(transaction -> transaction.getId() == id);
     }
 }

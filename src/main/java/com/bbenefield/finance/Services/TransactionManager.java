@@ -30,11 +30,13 @@ public class TransactionManager {
         return transactionRepository.getTransactions();
     }
 
-    public List<Transaction> getTransactionsByAmount(double min, double max) {
-        return this.transactions.stream().filter(transaction -> {
-            double transactionAmount = transaction.getAmount();
-            return transactionAmount >= min && transactionAmount <= max;
-        }).collect(Collectors.toList());
+    public List<Transaction> getTransactionsByAmount(double min, double max) throws IOException {
+        return transactionRepository.getTransactionsByAmount(min, max);
+
+//        return this.transactions.stream().filter(transaction -> {
+//            double transactionAmount = transaction.getAmount();
+//            return transactionAmount >= min && transactionAmount <= max;
+//        }).collect(Collectors.toList());
     }
 
     public List<Transaction> getTransactionsByDate(LocalDate earliestDate, LocalDate latestDate) {

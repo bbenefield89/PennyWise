@@ -11,5 +11,7 @@ import java.util.List;
 public interface ITransactionRepository {
     List<Transaction> getTransactions() throws IOException;
 
+    List<Transaction> getTransactionsByAmount(double min, double max) throws IOException;
+
     void createTransaction(Transaction transaction) throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException;
 }

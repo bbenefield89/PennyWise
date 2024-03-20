@@ -189,17 +189,19 @@ public class InputController {
     }
 
     private static void handleFilterTransactionsByAmount() {
-        System.out.println("Please provide a minimum amount:");
-        double minAmount = scanner.nextDouble();
+        try {
+            System.out.println("Please provide a minimum amount:");
+            double minAmount = scanner.nextDouble();
 
-        System.out.println("Please provide a maximum amount:");
-        double maxAmount = scanner.nextDouble();
+            System.out.println("Please provide a maximum amount:");
+            double maxAmount = scanner.nextDouble();
 
-        List<Transaction> transactions = transactionManager.getTransactionsByAmount(
-                minAmount,
-                maxAmount);
-
-        handleDisplayTransactions(transactions);
+            List<Transaction> transactions = transactionManager.getTransactionsByAmount(minAmount, maxAmount);
+            handleDisplayTransactions(transactions);
+        }
+        catch (IOException e) {
+            System.out.println("Error filtering transactions by amount: " + e.getMessage());
+        }
     }
 
     private static void handleFilterTransactionsByDate() {

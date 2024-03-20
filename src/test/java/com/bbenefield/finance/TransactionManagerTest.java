@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -79,11 +80,11 @@ public class TransactionManagerTest {
         verify(transactionRepositoryMock, times(1))
                 .getTransactions();
 
-        assertTrue(exception.getMessage().contains("IOException from test method"));
+        assertEquals("IOException from test method", exception.getMessage());
     }
 
     @Test
-    public void getTransactions_ZeroTransactionsReturned() throws Exception {
+    public void getTransactions_ZeroTransactionsReturnedTest() throws Exception {
         when(transactionRepositoryMock.getTransactions())
                 .thenReturn(new ArrayList<>());
 
@@ -91,7 +92,7 @@ public class TransactionManagerTest {
     }
 
     @Test
-    public void getTransactions_MultipleTransactionsReturned() throws Exception {
+    public void getTransactions_MultipleTransactionsReturnedTest() throws Exception {
         List<Transaction> transactions = Arrays.asList(
                 new Transaction(100.00, LocalDate.now(), "Income", "Salary"),
                 new Transaction(100.00, LocalDate.now(), "Income", "Salary"));
@@ -102,21 +103,48 @@ public class TransactionManagerTest {
         assertEquals(2, transactionManager.getTransactions().size());
     }
 
-//    @Test
-//    public void getTransactionsByAmountTest() {
-//        List<Transaction> transactions = Arrays.asList(
-//                new Transaction(0, 100.00, LocalDate.now(), "Income", "Salary"),
-//                new Transaction(1, 100.00, LocalDate.now(), "Income", "Salary"));
-//
-//        int actual1 = transactionManager.getTransactionsByAmount(0, 10).size();
-//        assertEquals(1, actual1, "Should return one transaction");
-//
-//        int actual2 = transactionManager.getTransactionsByAmount(0, 100).size();
-//        assertEquals(2, actual2, "Should return two transaction");
-//
-//        int actual3 = transactionManager.getTransactionsByAmount(100, 100).size();
-//        assertEquals(0, actual3, "Should return zero transaction");
-//    }
+    @Test
+    public void getTransactionsByAmountTest_IOExceptionTest() throws IOException {
+        doThrow(new IOException("IOException TransactionManager::getTransactionsByAmount"))
+                .when(transactionRepositoryMock)
+                        .getTransactionsByAmount(anyDouble(), anyDouble());
+        Exception exception = assertThrows(IOException.class, () -> transactionManager.getTransactionsByAmount(0, 0));
+        assertEquals("IOException TransactionManager::getTransactionsByAmount", exception.getMessage());
+    }
+
+    @Test
+    public void getTransactionsByAmountTest_ZeroTransactionsReturnedTest() throws IOException {
+        when(transactionRepositoryMock.getTransactionsByAmount(anyDouble(), anyDouble()))
+                .thenReturn(Collections.emptyList());
+
+        int actual = transactionManager.getTransactionsByAmount(0, 100).size();
+        assertEquals(0, actual, "getTransactionsByAmount(0, 100) Should return zero transaction");
+    }
+
+    @Test
+    public void getTransactionsByAmountTest_SingleTransactionReturnedTest() throws IOException {
+        List<Transaction> transactions = List.of(
+                new Transaction(10.00, LocalDate.now(), "Income", "Salary"));
+
+        when(transactionRepositoryMock.getTransactionsByAmount(anyDouble(), anyDouble()))
+                .thenReturn(transactions);
+
+        int actual = transactionManager.getTransactionsByAmount(0, 10).size();
+        assertEquals(1, actual, "getTransactionsByAmount(0, 100) Should return one transaction");
+    }
+
+    @Test
+    public void getTransactionsByAmountTest_MultipleTransactionsReturnedTest() throws IOException {
+        List<Transaction> transactions = Arrays.asList(
+                new Transaction(10.00, LocalDate.now(), "Income", "Salary"),
+                new Transaction(100.00, LocalDate.now(), "Income", "Salary"));
+
+        when(transactionRepositoryMock.getTransactionsByAmount(anyDouble(), anyDouble()))
+                .thenReturn(transactions);
+
+        int actual = transactionManager.getTransactionsByAmount(0, 100).size();
+        assertEquals(2, actual, "getTransactionsByAmount(0, 100) Should return two transaction");
+    }
 
 //    @Test
 //    public void getTransactionsByDateTest() {

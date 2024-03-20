@@ -15,7 +15,7 @@ public class FileTransactionRepository implements ITransactionRepository {
     private final String pathToLedger;
 
     public FileTransactionRepository(String pathToLedger) {
-        this.pathToLedger = pathToLedger;
+        this.pathToLedger = LedgerRepository.ledgerDirPath + "/" + pathToLedger;
     }
 
     @Override

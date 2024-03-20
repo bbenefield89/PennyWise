@@ -25,4 +25,9 @@ public class LedgerRepository {
         Path path = Path.of(String.format("%s/%s", ledgerDirPath, ledgerFileName));
         return Files.exists(path);
     }
+
+    public static Path createLedger(String ledgerFileName) throws IOException {
+        Path path = Path.of(String.format("%s/%s", ledgerDirPath, ledgerFileName));
+        return Files.createFile(path);
+    }
 }

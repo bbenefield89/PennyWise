@@ -45,21 +45,36 @@ public class InputController {
     }
 
     private static boolean handleLoadExistingLedger() {
-        String statement = "\nPlease provide the file name of your ledger (e.g my_ledger.txt)";
+        String statement = "\nPlease provide the file name of your ledger (e.g my_ledger.csv)";
         System.out.println(statement);
         String ledgerFileName = scanner.next();
 
-        if (LedgerRepository.checkLedgerExistence("ledger_1.csv")) {
-            transactionRepository = new FileTransactionRepository("./ledgers/ledger_1.csv");
+        if (LedgerRepository.checkLedgerExistence(ledgerFileName)) {
+            transactionRepository = new FileTransactionRepository(ledgerFileName);
             transactionManager = new TransactionManager(transactionRepository);
             return true;
         }
 
+        System.out.println("\nLedger named " + ledgerFileName + " not found\n");
         return false;
     }
 
     private static boolean handleCreateNewLedger() {
-        return true;
+        String statement = "\nPlease provide a name for your new ledger (e.g. my_ledger.csv)";
+        System.out.println(statement);
+        String ledgerFileName = scanner.next();
+
+        try {
+            LedgerRepository.createLedger(ledgerFileName);
+            transactionRepository = new FileTransactionRepository(ledgerFileName);
+            transactionManager = new TransactionManager(transactionRepository);
+            return true;
+        }
+        catch (IOException e) {
+            System.out.println("\nError creating ledger: " + e.getMessage() + "\n");
+        }
+
+        return false;
     }
 
     public static void acceptUserInput() {

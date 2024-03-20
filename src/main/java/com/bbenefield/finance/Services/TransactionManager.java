@@ -22,7 +22,8 @@ public class TransactionManager {
         this.transactionRepository = transactionRepository;
     }
 
-    public void addTransaction(Transaction transaction) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
+    public void addTransaction(Transaction transaction)
+            throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
         transactionRepository.createTransaction(transaction);
     }
 
@@ -32,34 +33,22 @@ public class TransactionManager {
 
     public List<Transaction> getTransactionsByAmount(double min, double max) throws IOException {
         return transactionRepository.getTransactionsByAmount(min, max);
-
-//        return this.transactions.stream().filter(transaction -> {
-//            double transactionAmount = transaction.getAmount();
-//            return transactionAmount >= min && transactionAmount <= max;
-//        }).collect(Collectors.toList());
     }
 
-    public List<Transaction> getTransactionsByDate(LocalDate earliestDate, LocalDate latestDate) {
-        return this.transactions.stream().filter(transaction -> {
-            LocalDate transactionDate = transaction.getDate();
-            return (transactionDate.isAfter(earliestDate) || transactionDate.isEqual(earliestDate)) &&
-                    (transactionDate.isBefore(latestDate) || transactionDate.isEqual(latestDate));
-        }).collect(Collectors.toList());
+    public List<Transaction> getTransactionsByDate(LocalDate earliestDate, LocalDate latestDate) throws IOException {
+        return transactionRepository.getTransactionsByDate(earliestDate, latestDate);
     }
 
-    public List<Transaction> getTransactionsByType(String type) {
-        return this.transactions.stream().filter(transaction -> {
-            return transaction.getType().equals(type);
-        }).collect(Collectors.toList());
+    public List<Transaction> getTransactionsByType(String type) throws IOException {
+        return transactionRepository.getTransactionsByType(type);
     }
 
-    public List<Transaction> getTransactionsByCategory(String category) {
-        return this.transactions.stream().filter(transaction -> {
-            return transaction.getCategory().equals(category);
-        }).collect(Collectors.toList());
+    public List<Transaction> getTransactionsByCategory(String category) throws IOException {
+        return transactionRepository.getTransactionsByCategory(category);
     }
 
-    public boolean deleteTransactionById(UUID id) {
-        return transactions.removeIf(transaction -> transaction.getId() == id);
+    public boolean deleteTransactionById(UUID id)
+            throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
+        return transactionRepository.deleteTransactionById(id);
     }
 }

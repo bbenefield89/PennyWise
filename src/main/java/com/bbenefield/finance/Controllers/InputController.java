@@ -119,11 +119,14 @@ public class InputController {
 
         try {
             transactionManager.addTransaction(transaction);
-        } catch (CsvRequiredFieldEmptyException e) {
+        }
+        catch (CsvRequiredFieldEmptyException e) {
             System.out.println("A required fields in the CSV file is empty: " + e.getMessage());
-        } catch (CsvDataTypeMismatchException e) {
+        }
+        catch (CsvDataTypeMismatchException e) {
             System.out.println("There is a data type mismatch in the CSV: " + e.getMessage());
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             System.out.println("An error occurred while reading/writing CSV: " + e.getMessage());
         }
     }
@@ -143,13 +146,25 @@ public class InputController {
 
         String transactionIdString = scanner.next();
         UUID transactionId = UUID.fromString(transactionIdString);
-        boolean is_removed = transactionManager.deleteTransactionById(transactionId);
 
-        if (is_removed) {
-            System.out.printf("Transaction %s has been successfully removed", transactionId);
+        try {
+            boolean is_removed = transactionManager.deleteTransactionById(transactionId);
+
+            if (is_removed) {
+                System.out.printf("Transaction %s has been successfully removed", transactionId);
+            }
+            else {
+                System.out.printf("No transaction with id %s found", transactionId);
+            }
         }
-        else {
-            System.out.printf("No transaction with id %s found", transactionId);
+        catch (CsvRequiredFieldEmptyException e) {
+            System.out.println("A required fields in the CSV file is empty: " + e.getMessage());
+        }
+        catch (CsvDataTypeMismatchException e) {
+            System.out.println("There is a data type mismatch in the CSV: " + e.getMessage());
+        }
+        catch (IOException e) {
+            System.out.println("An error occurred while reading/writing CSV: " + e.getMessage());
         }
 
         System.out.println("\n");
@@ -215,25 +230,36 @@ public class InputController {
         String latestDateString = scanner.next();
         LocalDate latestDate = LocalDate.parse(latestDateString, dateTimeFormatter);
 
-        List<Transaction> transactions = transactionManager.getTransactionsByDate(
-                earliestDate,
-                latestDate);
-
-        handleDisplayTransactions(transactions);
+        try {
+            List<Transaction> transactions = transactionManager.getTransactionsByDate(earliestDate, latestDate);
+            handleDisplayTransactions(transactions);
+        } catch (IOException e) {
+            System.out.println("Error filtering transactions by date: " + e.getMessage());
+        }
     }
 
     private static void handleFilterTransactionsByType() {
         System.out.println("Please provide the type to filter by:");
         String type = scanner.next();
-        List<Transaction> transactions = transactionManager.getTransactionsByType(type);
-        handleDisplayTransactions(transactions);
+        try {
+            List<Transaction> transactions = transactionManager.getTransactionsByType(type);
+            handleDisplayTransactions(transactions);
+        } catch (IOException e) {
+            System.out.println("Error filtering transactions by type: " + e.getMessage());
+        }
     }
 
     private static void handleFilterTransactionsByCategory() {
         System.out.println("Please provide the category to filter by:");
         String category = scanner.next();
-        List<Transaction> transactions = transactionManager.getTransactionsByCategory(category);
-        handleDisplayTransactions(transactions);
+
+        try {
+            List<Transaction> transactions = transactionManager.getTransactionsByCategory(category);
+            handleDisplayTransactions(transactions);
+        }
+        catch (IOException e) {
+            System.out.println("Error filtering transactions by type: " + e.getMessage());
+        }
     }
 
     private static void handleDisplayTransactions(List<Transaction> transactions) {

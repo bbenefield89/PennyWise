@@ -1,7 +1,6 @@
 package com.bbenefield.finance;
 
 import com.bbenefield.finance.Models.Transaction;
-import com.bbenefield.finance.Repositories.FileTransactionRepository;
 import com.bbenefield.finance.Repositories.ITransactionRepository;
 import com.bbenefield.finance.Services.TransactionManager;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
@@ -9,13 +8,9 @@ import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -73,9 +68,7 @@ public class TransactionManagerTest {
                 .when(transactionRepositoryMock)
                 .getTransactions();
 
-        Exception exception = assertThrows(IOException.class, () -> {
-            transactionManager.getTransactions();
-        }, "Hello");
+        Exception exception = assertThrows(IOException.class, () -> transactionManager.getTransactions());
 
         verify(transactionRepositoryMock, times(1))
                 .getTransactions();
@@ -143,139 +136,172 @@ public class TransactionManagerTest {
                 .thenReturn(transactions);
 
         int actual = transactionManager.getTransactionsByAmount(0, 100).size();
-        assertEquals(2, actual, "getTransactionsByAmount(0, 100) Should return two transaction");
+        assertEquals(2, actual, "getTransactionsByAmount(0, 100) Should return two transactions");
     }
 
-//    @Test
-//    public void getTransactionsByDateTest() {
-//        Transaction transaction1 = new Transaction(
-//                0,
-//                10,
-//                LocalDate.parse("2024-03-02"),
-//                "Income",
-//                "Paycheck");
-//
-//        Transaction transaction2 = new Transaction(
-//                0,
-//                20,
-//                LocalDate.parse("2024-03-14"),
-//                "Income",
-//                "Paycheck");
-//
-//        transactionManager.addTransaction(transaction1);
-//        transactionManager.addTransaction(transaction2);
-//
-//        int actual1 = transactionManager.getTransactionsByDate(
-//                LocalDate.parse("2024-03-02"),
-//                LocalDate.parse("2024-03-03"))
-//                    .size();
-//        assertEquals(1, actual1, "Should return one transaction");
-//
-//        int actual2 = transactionManager.getTransactionsByDate(
-//                LocalDate.parse("2024-03-01"),
-//                LocalDate.parse("2024-03-14"))
-//                    .size();
-//        assertEquals(2, actual2, "Should return two transactions");
-//
-//        int actual3 = transactionManager.getTransactionsByDate(
-//                LocalDate.parse("1970-01-01"),
-//                LocalDate.parse("1970-01-01"))
-//                    .size();
-//        assertEquals(0, actual3, "Should return zero transaction");
-//    }
-//
-//    @Test
-//    public void getTransactionsByTypeTest() {
-//        Transaction transaction1 = new Transaction(
-//                0,
-//                10,
-//                LocalDate.parse("2024-03-02"),
-//                "Income",
-//                "Paycheck");
-//
-//        Transaction transaction2 = new Transaction(
-//                0,
-//                20,
-//                LocalDate.parse("2024-03-14"),
-//                "Withdraw",
-//                "Paycheck");
-//
-//        Transaction transaction3 = new Transaction(
-//                0,
-//                20,
-//                LocalDate.parse("2024-03-14"),
-//                "Withdraw",
-//                "Paycheck");
-//
-//        transactionManager.addTransaction(transaction1);
-//        transactionManager.addTransaction(transaction2);
-//        transactionManager.addTransaction(transaction3);
-//
-//        int actual1 = transactionManager.getTransactionsByType("Income").size();
-//        assertEquals(1, actual1, "Should return one transaction");
-//
-//        int actual2 = transactionManager.getTransactionsByType("Withdraw").size();
-//        assertEquals(2, actual2, "Should return two transactions");
-//
-//        int actual3 = transactionManager.getTransactionsByType("foobar").size();
-//        assertEquals(0, actual3, "Should return zero transaction");
-//    }
-//
-//    @Test
-//    public void getTransactionsByCategoryTest() {
-//        Transaction transaction1 = new Transaction(
-//                0,
-//                10,
-//                LocalDate.parse("2024-03-02"),
-//                "Income",
-//                "Paycheck");
-//
-//        Transaction transaction2 = new Transaction(
-//                0,
-//                20,
-//                LocalDate.parse("2024-03-14"),
-//                "Withdraw",
-//                "Grocery");
-//
-//        Transaction transaction3 = new Transaction(
-//                0,
-//                20,
-//                LocalDate.parse("2024-03-14"),
-//                "Withdraw",
-//                "Grocery");
-//
-//        transactionManager.addTransaction(transaction1);
-//        transactionManager.addTransaction(transaction2);
-//        transactionManager.addTransaction(transaction3);
-//
-//        int actual1 = transactionManager.getTransactionsByCategory("Paycheck").size();
-//        assertEquals(1, actual1, "Should return one transaction");
-//
-//        int actual2 = transactionManager.getTransactionsByCategory("Grocery").size();
-//        assertEquals(2, actual2, "Should return two transactions");
-//
-//        int actual3 = transactionManager.getTransactionsByCategory("foobar").size();
-//        assertEquals(0, actual3, "Should return zero transaction");
-//    }
-//
-//    @Test
-//    public void deleteTransactionByIdTest() {
-//        Transaction transaction = new Transaction(
-//                0,
-//                10,
-//                LocalDate.parse("2024-03-02"),
-//                "Income",
-//                "Paycheck");
-//
-//        transactionManager.addTransaction(transaction);
-//
-//        int actual1 = transactionManager.getTransactions().size();
-//        assertEquals(1, actual1, "Should return one transaction");
-//
-//        transactionManager.deleteTransactionById(0);
-//
-//        int actual2 = transactionManager.getTransactions().size();
-//        assertEquals(0, actual2, "Should return two transactions");
-//    }
+    @Test
+    public void getTransactionsByDate_IOExceptionTest() throws IOException {
+        LocalDate earliestDate = LocalDate.parse("2024-03-01");
+        LocalDate latestDate = LocalDate.parse("2024-03-20");
+        String exceptionMessage = "IOException TransactionManager::getTransactionsByDate";
+
+        doThrow(new IOException(exceptionMessage))
+                .when(transactionRepositoryMock)
+                        .getTransactionsByDate(any(LocalDate.class), any(LocalDate.class));
+
+        Exception exception = assertThrows(IOException.class, () -> {
+            transactionManager.getTransactionsByDate(earliestDate, latestDate);
+        });
+
+        assertEquals(exceptionMessage, exception.getMessage());
+    }
+
+    @Test
+    public void getTransactionsByDate_ZeroTransactionsReturnedTest() throws IOException {
+        LocalDate earliestDate = LocalDate.parse("2024-03-01");
+        LocalDate latestDate = LocalDate.parse("2024-03-20");
+
+        when(transactionRepositoryMock.getTransactionsByDate(earliestDate, latestDate))
+                .thenReturn(Collections.emptyList());
+
+        int expected = 0;
+        int actual = transactionManager.getTransactionsByDate(earliestDate, latestDate).size();
+
+        assertEquals(expected, actual, "getTransactionsByDateTest should return zero transactions");
+    }
+
+    @Test
+    public void getTransactionsByDate_OneOrMoreTransactionsReturnedTest() throws IOException {
+        List<Transaction> transactions = Arrays.asList(
+                new Transaction(10.00, LocalDate.parse("1970-01-01"), "Income", "Salary"),
+                new Transaction(100.00, LocalDate.parse("3000-01-01"), "Income", "Salary"));
+        LocalDate earliestDate = LocalDate.parse("2024-03-01");
+        LocalDate latestDate = LocalDate.parse("2024-03-20");
+
+        when(transactionRepositoryMock.getTransactionsByDate(earliestDate, latestDate))
+                .thenReturn(transactions);
+
+        int expected = 2;
+        int actual = transactionManager.getTransactionsByDate(earliestDate, latestDate).size();
+
+        assertEquals(expected, actual, "getTransactionsByDateTest should return zero transactions");
+    }
+
+    @Test
+    public void getTransactionsByType_IOExceptionTest() throws IOException {
+        String exceptionMessage = "IOException TransactionManager::getTransactionsByType";
+
+        doThrow(new IOException(exceptionMessage))
+                .when(transactionRepositoryMock)
+                    .getTransactionsByType(anyString());
+
+        Exception exception = assertThrows(IOException.class, () -> {
+            transactionManager.getTransactionsByType(anyString());
+        });
+
+        assertEquals(exceptionMessage, exception.getMessage());
+    }
+
+    @Test
+    public void getTransactionsByType_ZeroTransactionsReturnedTest() throws IOException {
+        when(transactionRepositoryMock.getTransactionsByType(anyString()))
+                .thenReturn(Collections.emptyList());
+
+        int expected = 0;
+        int actual = transactionManager.getTransactionsByType(anyString()).size();
+
+        assertEquals(expected, actual, "getTransactionsByType should return zero transactions");
+    }
+
+    @Test
+    public void getTransactionsByType_OneOrMoreTransactionsReturnedTest() throws IOException {
+        List<Transaction> transactions = Arrays.asList(
+                new Transaction(10.00, LocalDate.parse("1970-01-01"), "Income", "Salary"),
+                new Transaction(100.00, LocalDate.parse("3000-01-01"), "Income", "Salary"));
+
+        when(transactionRepositoryMock.getTransactionsByType(anyString()))
+                .thenReturn(transactions);
+
+        int expected = 2;
+        int actual = transactionManager.getTransactionsByType(anyString()).size();
+
+        assertEquals(expected, actual, "getTransactionsByType should return zero transactions");
+    }
+
+    @Test
+    public void getTransactionsByCategory_IOExceptionTest() throws IOException {
+        String exceptionMessage = "IOException TransactionManager::getTransactionsByCategory";
+
+        doThrow(new IOException(exceptionMessage))
+                .when(transactionRepositoryMock)
+                .getTransactionsByCategory(anyString());
+
+        Exception exception = assertThrows(IOException.class, () -> {
+            transactionManager.getTransactionsByCategory(anyString());
+        });
+
+        assertEquals(exceptionMessage, exception.getMessage());
+    }
+
+    @Test
+    public void getTransactionsByCategory_ZeroTransactionsReturnedTest() throws IOException {
+        when(transactionRepositoryMock.getTransactionsByCategory(anyString()))
+                .thenReturn(Collections.emptyList());
+
+        int expected = 0;
+        int actual = transactionManager.getTransactionsByCategory(anyString()).size();
+
+        assertEquals(expected, actual, "getTransactionsByCategory should return zero transactions");
+    }
+
+    @Test
+    public void getTransactionsByCategory_OneOrMoreTransactionsReturnedTest() throws IOException {
+        List<Transaction> transactions = Arrays.asList(
+                new Transaction(10.00, LocalDate.parse("1970-01-01"), "Income", "Salary"),
+                new Transaction(100.00, LocalDate.parse("3000-01-01"), "Income", "Salary"));
+
+        when(transactionRepositoryMock.getTransactionsByCategory(anyString()))
+                .thenReturn(transactions);
+
+        int expected = 2;
+        int actual = transactionManager.getTransactionsByCategory(anyString()).size();
+
+        assertEquals(expected, actual, "getTransactionsByCateogory should return zero transactions");
+    }
+
+    @Test
+    public void deleteTransactionById_IOExceptionTest() throws IOException {
+        String exceptionMessage = "IOException TransactionManager::deleteTransactionById";
+
+        doThrow(new IOException(exceptionMessage))
+                .when(transactionRepositoryMock)
+                .getTransactionsByCategory(anyString());
+
+        Exception exception = assertThrows(IOException.class, () -> {
+            transactionManager.getTransactionsByCategory(anyString());
+        });
+
+        assertEquals(exceptionMessage, exception.getMessage());
+    }
+
+    @Test
+    public void deleteTransactionById_TruthyTest()
+            throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
+        when(transactionRepositoryMock.deleteTransactionById(any()))
+                .thenReturn(true);
+
+        UUID id = UUID.randomUUID();
+        assertTrue(transactionManager.deleteTransactionById(id));
+    }
+
+    @Test
+    public void deleteTransactionById_FalsyTest()
+            throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
+        when(transactionRepositoryMock.deleteTransactionById(any()))
+                .thenReturn(false);
+
+        UUID id = UUID.randomUUID();
+        assertFalse(transactionManager.deleteTransactionById(id));
+    }
 
 }
